@@ -1,0 +1,105 @@
+---
+output: html_document
+runtime: shiny
+---
+```{r}
+library(shiny)
+library(shinydashboard)
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+
+HDI = read.csv("HDI.csv")
+
+dashboardPage(
+  dashboardHeader(),
+  dashboardSidebar(),
+  dashboardBody()
+)
+
+library(shiny)
+library(shinydashboard)
+
+ui <-   dashboardPage(
+    dashboardHeader(title = "Human Development Index"),
+    dashboardSidebar(
+      sidebarMenu(
+        menuItem("Pairwise Relation", tabName = "part_a")
+      )
+    ),
+    dashboardBody(
+      tabItems(
+        # First tab content
+        tabItem(tabName = "part_a",
+                tabsetPanel(type = "tabs",
+                          tabPanel("Scatter Plot", 
+                                   plotOutput("plot1"),
+                         sliderInput(inputId = "pointSize1",
+                                     label = "points' size adjustment:",
+                                     min = 0.5, max = 3, value = 1, step = 0.3),
+                        sliderInput(inputId = "pointSize2",
+                                     label = "points' size adjustment:",
+                                     min = 0.5, max = 3, value = 1, step = 0.3)
+                       
+                ),
+                      tabPanel("Histogram",
+                          plotOutput("plot2", height = 250),
+                          selectInput(inputId = "n_breaks",
+                                      label = "Number of bins in histogram (approximate):",
+                                      choices = c(10, 20, 35, 50),
+                                      selected = 20))
+                )
+        )
+    )
+  )
+)
+HDI <- read.csv("https://raw.githubusercontent.com/wacero666/36315-Interactive-Graphs/master/HDI.csv?token=ATCO4fxg736-wds9LCcI4ZMRg5yi7nqxks5cFYi8wA%3D%3D")
+
+server <- function(input, output) {
+  
+  HDI$GNI_Male = HDI$Estimated.gross.national.income.per.capita.Male
+  HDI$GNI_Female = HDI$Estimated.gross.national.income.per.capita.Female
+  HDI$Income_Inequality = HDI$Inequality.adjusted.income.index
+  output$plot1 <- renderPlot({
+    
+      p <- ggplot(data = HDI, aes(x = Id, color = Income_Inequality, text = Country)) +
+            geom_point(aes(y =GNI_Female,size = input$pointSize1)) + 
+            geom_point(aes(y =GNI_Male,size = input$pointSize2)) + 
+            theme_bw() + 
+            labs(title = "Estimated Gross Incomes of Countries by Gender",
+                 y = "Estimated Gross Income", x = "Countries ID") + 
+            scale_color_gradient(low = "dodgerblue",
+                        high = "pink",name = "HDI Rank") 
+      gg <- style(p, hoverinfo = "Country")
+      gg
+    })
+  
+  output$plot2 <- renderPlot({
+    
+  HDI$Physicians = HDI$Physicians...per.10.000.people..2001.2014
+  HDI$Tuberculosis = HDI$Deaths.due.to.Tuberculosis..per.100.000.people..
+  HDI$Fertility = HDI$Total.fertility.rate..birth.per.woman..2000.2007
+  HDI2 <- HDI[which(HDI$Physicians != "NA"),]
+  HDI2 <- HDI2[which(HDI2$Tuberculosis != "NA"),]
+  HDI2 <- HDI2[which(HDI2$Fertility != "NA"),]
+
+  HDI2 <- mutate(HDI2, Physicians = cut(Physicians, c(-1, 5, 10, 20, Inf),
+                          labels = c("Extrmely Low (<5)","Low(<10)",
+                                     "Moderate (<20)", "High(<infinity)")),
+                    Tuberculosis = cut(Tuberculosis, c(-1, 10, 20, 40, 60, Inf),
+                          labels = c("Extremely Low","Low",
+                                     "Mid", "Slightly Large","Significantly Large")))
+  
+      gg <- ggplot(data = HDI2, aes(x = Fertility, y = ..density.., fill = Tuberculosis)) +
+            geom_histogram(aes(y = ..density..), bins = as.numeric(input$n_breaks)) + 
+            facet_wrap(~Physicians) + 
+            labs(title = "Countries's Fertility Rate By Number of Physicians Avaliable",
+                 y = "Rate", x = "Fertility Rate") 
+    gg
+  })
+  
+}
+
+shinyApp(ui, server)
+
+```
