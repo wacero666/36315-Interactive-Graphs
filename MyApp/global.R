@@ -79,7 +79,9 @@ world_hdi <- world_hdi %>%
                                            
   )))
 world_hdi$Country <- as.character(world_hdi$Country)
-
+world_hdi <- mutate(world_hdi, HDLevel = cut(HDI, c(0, 0.556, 0.7, 0.8, 1),
+                                             labels = c("Low Human Development",  "Medium Human Development",
+                                                        "High Human Development", "Very High Human Development")))
 if (!("data/world.Rdata" %in% list.files())){
   library(geojsonio)
   world = geojson_read("countries.geojson", method = "local", what = "sp")
@@ -93,11 +95,8 @@ world_info$name <- as.character(world_info$name)
 
 world_info <- world_info %>% left_join(world_hdi,
                                        by = c("name" = "Country"))
-
 pal <- colorBin("YlOrRd", domain = world_info$HDI,
-                bins = quantile(
-                  world_info$HDI,
-                  seq(0,1,by = .2),na.rm = T))
+                bins = c(0,0.556, 0.7, 0.8, 1))
 
 
 labels_world <- paste0(

@@ -26,24 +26,41 @@ tabPanel("HTML Widgets -- leaflet",
  
 tabPanel("HTML Widgets -- Dygraphs",
          selectizeInput(inputId = "country_subset", 
-                        label = "Choose Your Content Ratings", 
+                        label = "Select Countries", 
                         choices = world_hdi$Country, 
-                        selected = c("China", "United States", "United Kingdom",
-                                     "Congo", "Albania","Bosnia and Herzegovia",
-                                     "Poland"), 
+                        selected = c("China", "Mexico", "United States", "United Kingdom",
+                                     "Congo","Sudan"), 
                         multiple = TRUE,
                         options = NULL),
          
            
           plotlyOutput(outputId = "plotshiny", height = 400, width = 900)
-  )
-############################################################################
-# Leaflet: HTML Widget (embedded in Shiny)
-############################################################################ 
+),
 
 
+tabPanel("Scatter Plot GNI",
+
+         sliderInput(inputId = "pointSize1",
+                     label = "points' size adjustment:",
+                     min = 0.5, max = 3, value = 1, step = 0.3),
+         sliderInput(inputId = "pointSize2",
+                     label = "points' size adjustment:",
+                     min = 0.5, max = 3, value = 1, step = 0.3),
+         selectizeInput(inputId = "Gender",
+                        label = "Choose Your Content Ratings",
+                        choices = c("Overall", "Female", "Male") ,
+                        selected = c("Overall", "Female", "Male"),
+                        multiple = TRUE,
+                        options = NULL),
+         plotlyOutput(outputId = "plot1", height = 400, width = 900)
 
 
-
+),
+        tabPanel("Histogram",
+                 plotlyOutput("plot2", height = 250),
+                 selectInput(inputId = "n_breaks",
+                             label = "Number of bins in histogram (approximate):",
+                             choices = c(10, 20, 35, 50),
+                             selected = 20))
 
 )

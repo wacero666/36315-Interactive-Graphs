@@ -47,8 +47,9 @@ output$leaflet <- renderLeaflet({
                   direction = "auto")) %>%
     addLegend(pal = pal, 
               values = ~world_info$HDI,
-              title = "HDI among Countries")
-  
+              labFormat = labelFormat(),
+              title = "Human Development Index")
+ 
   return(m_leaflet)
 })
 
@@ -73,14 +74,40 @@ output$plotshiny <- renderPlotly({
   })
   
   p <- ggplot(gdppc()) + my_theme +
-    labs (x = "Decades", y = "Average Annual HDI Growth", title = "Average Annual HDI Growth 1990-2015") + 
+    labs (x = "Decades", y = "Average Annual HDI Growth(%)", title = "Average Annual HDI Growth 1990-2015(%)") + 
     geom_line(mapping = aes(x = Decades, y = value, colour = variable, group = variable)) + 
     scale_colour_discrete(name = "Country")
  
-  p_plotly <- ggplotly(p,height = 300)
+  p_plotly <- ggplotly(p,height = 400)
   
   return(p_plotly)
 
+})
+
+#scatterplot
+
+output$plot1 <- renderPlotly({
+# color = Income_Inequality
+  p <- ggplot(data = world_hdi, aes(text = Country)) + my_theme +
+    labs(title = "Estimated Gross Incomes of Countries by Gender", y = "HDI", x = "GNI")
+ if("Overall" %in% input$Gender){
+   p <- p + geom_point(aes(x = Gross.national.income..GNI..per.capita, y = HDI), size = input$pointSize2)
+ }
+    
+  if("Male" %in% input$Gender){
+    p <- p + geom_point(aes(x = Estimated.gross.national.income.per.capita.Male, y = HDI), size = input$pointSize2, color = "blue")
+  }
+  if("Female" %in% input$Gender){
+    p <- p + geom_point(aes(x = Estimated.gross.national.income.per.capita.Female, y = HDI), size = input$pointSize2, color = "red")
+  }
+  p_plotly <- ggplotly(p, height = 400)
+  return(p_plotly)
+})
+
+output$plot2 <- renderPlotly({
+  p <- ggplot(data = world_hdi) + geom_histogram(aes(x = Life.expectancy, fill = HDLevel, color = "black"))
+  p_plotly <- ggplotly(p, height = 400)
+  return(p_plotly)
 })
 
 }
