@@ -56,11 +56,32 @@ tabPanel("Scatter Plot GNI",
 
 
 ),
-        tabPanel("Histogram",
-                 plotlyOutput("plot2", height = 250),
-                 selectInput(inputId = "n_breaks",
-                             label = "Number of bins in histogram (approximate):",
-                             choices = c(10, 20, 35, 50),
-                             selected = 20))
+
+tabPanel("Education VS. HDI",
+         selectInput(inputId = "education_choice",
+                     label = "Show general/female/male education ",
+                     choices = c("General","Female","Male"),
+                     selected = 5),
+         
+         plotlyOutput(outputId = "education_plotly_playable", 
+                      height = 600,
+                      width = 900)
+),
+
+tabPanel("Histogram",
+         plotlyOutput("plot2", height = 250),
+         selectInput(inputId = "n_breaks",
+                     label = "Number of bins in histogram (approximate):",
+                     choices = c(10, 20, 35, 50),
+                     selected = 20)),
+tabPanel("Countour Line",
+  checkboxInput(inputId = "contourline",
+                label = strong("Show ContourLine"),
+                value = FALSE),
+  
+  plotOutput(outputId = "m_plot", height = "300px")
+)
+
+
 
 )

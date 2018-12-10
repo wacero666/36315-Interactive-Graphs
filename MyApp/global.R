@@ -90,6 +90,11 @@ if (!("data/world.Rdata" %in% list.files())){
   load("data/world.Rdata")
 }
 
+#Add Continent column
+sub_world <- data.frame(name = world$name, continent = world$continent)
+world_hdi <- world_hdi %>% left_join(sub_world, by = c("Country" = "name")) 
+
+
 world_info <- data.frame(name = as.character(world$name) )
 world_info$name <- as.character(world_info$name)
 

@@ -84,14 +84,15 @@ output$plotshiny <- renderPlotly({
 
 })
 
-#scatterplot
+#GNI
 
 output$plot1 <- renderPlotly({
 # color = Income_Inequality
+  
   p <- ggplot(data = world_hdi, aes(text = Country)) + my_theme +
     labs(title = "Estimated Gross Incomes of Countries by Gender", y = "HDI", x = "GNI")
  if("Overall" %in% input$Gender){
-   p <- p + geom_point(aes(x = Gross.national.income..GNI..per.capita, y = HDI), size = input$pointSize2)
+   p <- p + geom_point(aes(x = Gross.national.income..GNI..per.capita, y = HDI), size = input$pointSize2) 
  }
     
   if("Male" %in% input$Gender){
@@ -100,6 +101,7 @@ output$plot1 <- renderPlotly({
   if("Female" %in% input$Gender){
     p <- p + geom_point(aes(x = Estimated.gross.national.income.per.capita.Female, y = HDI), size = input$pointSize2, color = "red")
   }
+  #Add Legend
   p_plotly <- ggplotly(p, height = 400)
   return(p_plotly)
 })
@@ -109,5 +111,157 @@ output$plot2 <- renderPlotly({
   p_plotly <- ggplotly(p, height = 400)
   return(p_plotly)
 })
+#Education
+output$education_plotly_playable <- renderPlotly({
+  if (input$education_choice == "General"){
+    p_gen <- ggplot(world_hdi, 
+                    aes(x = `HDI`,
+                        y = `Mean.years.of.schooling`,
+                        #color = continent,
+                        text = `Country`)) +
+      geom_point(
+        #frame = year
+      )  + 
+      labs(x = "HDI",
+           y = "Mean Years of Schooling",
+           #color = "Continent",
+           title = "HDI vs. Mean Years of Schooling") +
+      my_theme + scale_color_manual(values = cb_pal)
+    
+    
+  } else if (input$education_choice == "Female"){
+    p_gen <- ggplot(world_hdi, 
+                    aes(x = `HDI`, 
+                        #color = continent,
+                        text = `Country`)) +
+      geom_point(aes(y = `Mean.years.of.schooling.Female`
+                     #frame = year
+      )) + 
+      labs(x = "HDI",
+           y = "Mean Years of Schooling of Female",
+           #color = "Continent",
+           title = "HDI vs. Mean Years of Schooling of Female") +
+      my_theme + scale_color_manual(values = cb_pal)
+    
+    
+  } else {
+    p_gen <- ggplot(world_hdi, 
+                    aes(x = `HDI`, 
+                        #color = continent,
+                        text = `Country`)) +
+      geom_point(aes(y = `Mean.years.of.schooling.Male`
+                     #frame = year
+      )) + 
+      labs(x = "HDI",
+           y = "Mean Years of Schooling of Female",
+           #color = "Continent",
+           title = "HDI vs. Mean Years of Schooling of Male") +
+      my_theme + scale_color_manual(values = cb_pal)
+    
+  }
+  
+  p_gen_plotly <- ggplotly(p_gen,tooltip = "text")
+  
+  return(p_gen_plotly)
+})
+
+# Contour plot
+output$m_plot <- renderPlot({
+  continuous <- world_info %>% select("HDI","Life.expectancy",
+                                      "Mean.years.of.schooling",                                                                 "Gross.national.income..GNI..per.capita",                                                  "GNI.per.capita.rank.minus.HDI.rank",                                                      "Change.in.HDI.rank.2010.2015",                                                            "Average.annual.HDI.growth.1990.2000",                                                     "Average.annual.HDI.growth.2000.2010",
+                                      "Average.annual.HDI.growth.2010.2015",
+                                      "Average.annual.HDI.growth.1990.2015", 
+                                      "Gender.Development.Index.value",
+                                      "Gender.Development.Index.Group",
+                                      "Total.Population..millions..2015",                                                        "Total.Population..millions..2030",                                                        "Population.Average.annual.growth.2000.2005....",
+                                      "Population.Average.annual.growth.2010.2015....", 
+                                      "Population.Urban.2015..",  
+                                      "Population.Under.age.5..millions..2015",
+                                      "Population.Ages.15.64..millions..2015",
+                                      "Population.Ages.65.and.older..millions..2015", 
+                                      "Population.Median.age..years..2015",
+                                      "Dependency.Ration.Young.age..0.14....per.100.people.ages.15.64.",             
+                                      "Dependency.Ratio.Old.age..65.and.older....per.100.people.ages.15.64.",         
+                                      "Total.fertility.rate..birth.per.woman..2000.2005",                             
+                                      "Total.fertility.rate..birth.per.woman..2000.2007",                             
+                                      "Infants.exclusively.breastfed....ages.0.5.months..2010.2015",                  
+                                      "Infants.lacking.immunization.DTP....of.one.year.olds.",                        
+                                      "Infants.lacking.immunization.Measles....of.one.year.olds.",                    
+                                      "Child.malnutrition.Stunting..moderate.or.severe..2010.2015",                   
+                                      "Mortality.rates.Infant..per.1.000.live.births..2015",                          
+                                      "Mortality.rates.Under.five..per.1.000.live.births..2015" ,                     
+                                      "Deaths.due.to.Malria..per.100.000.people..",                                   
+                                      "Deaths.due.to.Tuberculosis..per.100.000.people..",                             
+                                      "HIV.prevalence..adult....ages.15.49.",                                         
+                                      "Life.expectancy.at.age.59..years..2010.2015",                                  
+                                      "Physicians...per.10.000.people..2001.2014",                                    
+                                      "Public.health.expenditure....of.GDP..2014",                                    
+                                      "Employment.to.population.ratio....ages.15.and.older." ,                        
+                                      "Labour.force.participation.rate....ages.15.and.older.",                        
+                                      "Employment.in.agriculture....of.total.employment..2010.2014",                  
+                                      "Employment.in.services....of.total.employment..2010..2014",                    
+                                      "Total.Unemployment....of.labour.force..2015" ,                                 
+                                      "Unemployment.Youth....ages.15.24..2010.2014" ,                                 
+                                      "Unemployment.Youth.not.in.school.or.employment....ages.15.24..2010.2014" ,     
+                                      "Vulnerable.employment....of.total.employment..2005.2014",                      
+                                      "Child.labour.....ages.5.14..2009.2015"   ,                                     
+                                      "Working.poor.at.PPP.3.10.a.day.....2004.2013",                                 
+                                      "Mandatory.paid.maternity.leave..days.",                                        
+                                      "Old.age.pension.recipients.....of.statutory.pension.age.population..2004.2013",
+                                      "Internet.users",                                                               
+                                      "Internet.users....2010..2015.",                                                
+                                      "Inequality.adjusted.HDI..IHDI.",                                               
+                                      "Inequality.adjusted.HDI..IHDI..Over.loss...",                                  
+                                      "Difference.from.HDI.rank",                                                     
+                                      "Coefficient.of.human.inequality",                                              
+                                      "Inequality.in.life.expectancy.....2010.2015" ,                                 
+                                      "Inequality.adjusted.life.expectancy.index",                                    
+                                      "Inequality.in.education..." ,                                                  
+                                      "Inequality.adjusted.education.index",                                          
+                                      "Inequality.in.income....",                                                     
+                                      "Inequality.adjusted.income.index",                                             
+                                      "Income.inequality..Quintile.ratio..2010.2015",                               
+                                      "Income.inequality..Palma.ratio..2010.2015",                                    
+                                      "Income.inequality..Gini.coefficient..2010.2015" )
+  continuous <- drop_na(continuous)
+  cont_scale <- scale(continuous)
+  
+  dist_cont <- dist(cont_scale)
+  
+  cont_mds <- cmdscale(dist_cont, k = 2)
+  
+  cont_mds <- data.frame(cont_mds)
+  
+  colnames(cont_mds) <- c("mds_coordinate_1", "mds_coordinate_2")
+  
+  
+  base <- ggplot(cont_mds, 
+                 aes(x = mds_coordinate_1, y = mds_coordinate_2)) 
+  
+  only_point <- base +
+    geom_point(size = 2) + 
+    my_theme
+  
+  gg_with_dens <- 
+    base + 
+    geom_density2d() + 
+    geom_point() + 
+    my_theme
+  
+  
+  if (input$contourline){
+    gg_with_dens + 
+      my_theme
+  } 
+  else {
+    base + 
+      geom_point()+ 
+      my_theme
+  }
+  
+  
+  
+})
+
 
 }
