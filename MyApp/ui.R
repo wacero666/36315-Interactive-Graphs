@@ -55,14 +55,14 @@ dashboardPage(
                                                   options = NULL),
                                    
                                    
-                                   plotlyOutput(outputId = "plotshiny", height = 400, width = 900)
+                                   plotlyOutput(outputId = "plotshiny", height = 500, width = 1000)
                           ),
                           tabPanel("MDS Plot",
                                    checkboxInput(inputId = "contourline",
                                                  label = strong("Show ContourLine"),
                                                  value = FALSE),
                                    
-                                   plotOutput(outputId = "m_plot", height = "300px")
+                                   plotOutput(outputId = "m_plot", height = "500px")
                           )
               )
       ),
@@ -77,7 +77,7 @@ dashboardPage(
                                                   selected = c("Overall", "Female", "Male"),
                                                   multiple = TRUE,
                                                   options = NULL),
-                                   plotlyOutput(outputId = "income_plotly", height = 400, width = 900), 
+                                   plotlyOutput(outputId = "income_plotly", height = 500, width = 1000), 
                                    
                                    checkboxInput(inputId = "regression_line",
                                                  label = strong("Show Regression Line"),

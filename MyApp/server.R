@@ -316,7 +316,12 @@ output$m_plot <- renderPlot({
   
   
   base <- ggplot(cont_mds, 
-                 aes(x = mds_coordinate_1, y = mds_coordinate_2)) 
+                 aes(x = mds_coordinate_1, y = mds_coordinate_2,
+                     color = continent, alpha = 0.6)) +
+    labs(title = "MDS Compression of Student Attributes",
+         x = "MDS Coordinate 1",
+         y = "MDS Coordinate 2",
+         coloe = "Continent")
   
   only_point <- base +
     geom_point(size = 2) + 
@@ -330,16 +335,11 @@ output$m_plot <- renderPlot({
   
   
   if (input$contourline){
-    gg_with_dens + 
-      my_theme
+    gg_with_dens 
   } 
   else {
-    base + 
-      geom_point()+ 
-      my_theme
+    only_point
   }
-  
-  
   
 })
 
