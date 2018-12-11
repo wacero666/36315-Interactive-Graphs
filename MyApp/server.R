@@ -75,8 +75,7 @@ output$plotshiny <- renderPlotly({
   
   p <- ggplot(gdppc()) + my_theme +
     labs (x = "Decades", y = "Average Annual HDI Growth(%)", title = "Average Annual HDI Growth 1990-2015(%)") + 
-    geom_line(mapping = aes(x = Decades, y = value, colour = variable, group = variable)) + 
-    scale_colour_discrete(name = "Country")
+    geom_line(mapping = aes(x = Decades, y = value, colour = variable, group = variable))
  
   p_plotly <- ggplotly(p,height = 400)
   
@@ -86,31 +85,95 @@ output$plotshiny <- renderPlotly({
 
 #GNI
 
-output$plot1 <- renderPlotly({
+output$income_plotly <- renderPlotly({
 # color = Income_Inequality
   
   p <- ggplot(data = world_hdi, aes(text = Country)) + my_theme +
-    labs(title = "Estimated Gross Incomes of Countries by Gender", y = "HDI", x = "GNI")
+    labs(title = "Countries's Estimated Gross National Income per Capita", 
+         y = "Human Development Index", x = "Gross National Income per Capita") + 
+    theme(legend.position = "bottom") 
+  
  if("Overall" %in% input$Gender){
-   p <- p + geom_point(aes(x = Gross.national.income..GNI..per.capita, y = HDI), size = input$pointSize2) 
+   p <- p + geom_point(aes(x = Gross.national.income..GNI..per.capita, y = HDI), color = "brown") 
  }
     
   if("Male" %in% input$Gender){
-    p <- p + geom_point(aes(x = Estimated.gross.national.income.per.capita.Male, y = HDI), size = input$pointSize2, color = "blue")
+    p <- p + geom_point(aes(x = Estimated.gross.national.income.per.capita.Male, y = HDI), color = "pink") 
   }
   if("Female" %in% input$Gender){
-    p <- p + geom_point(aes(x = Estimated.gross.national.income.per.capita.Female, y = HDI), size = input$pointSize2, color = "red")
+    p <- p + geom_point(aes(x = Estimated.gross.national.income.per.capita.Female, y = HDI), color = "orange")
   }
-  #Add Legend
+  p <- p 
   p_plotly <- ggplotly(p, height = 400)
   return(p_plotly)
 })
 
-output$plot2 <- renderPlotly({
-  p <- ggplot(data = world_hdi) + geom_histogram(aes(x = Life.expectancy, fill = HDLevel, color = "black"))
+output$health_histogram <- renderPlotly({
+  
+  temp <- world_hdi %>% select(Physicians...per.10.000.people..2001.2014,
+                       Deaths.due.to.Tuberculosis..per.100.000.people..)
+  temp <- mutate(temp, Physicians = cut(Physicians...per.10.000.people..2001.2014,
+                                        c(-1, 5, 10, 20, Inf),
+                                labels = c("Extrmely Low (<5)","Low(<10)",
+                                           "Moderate (<20)", "High(<infinity)")),
+         Tuberculosis = cut(Deaths.due.to.Tuberculosis..per.100.000.people..,
+                            c(-1, 10, 20, 40, 60, Inf),
+                            labels = c("Extremely Low","Low",
+                                       "Mid", "Slightly Large","Significantly Large")))
+  
+  if (input$health_choice == "General" && input$Regions == "all"){
+      p <- ggplot(data = world_hdi) + geom_histogram(aes(x = Life.expectancy, fill = HDLevel), color = "black",
+                                                     bins = as.numeric(input$n_breaks)) + 
+        labs(title = "Life Expectancy over HDI")
+     
+  }else if (input$health_choice == "Physicians" && input$Regions == "all"){
+      p <- ggplot(data = world_hdi) + geom_histogram(aes(x = Life.expectancy, fill = HDLevel), color = "black",
+                                                     bins = as.numeric(input$n_breaks)) + 
+            facet_wrap(~temp$Physicians) + 
+        labs(title = "Life Expectancy over HDI by Number of Physicians per 10,000 people")
+      
+  } else if (input$health_choice == "Tuberculosis" && input$Regions == "all"){
+    p <- ggplot(data = world_hdi) + geom_histogram(aes(x = Life.expectancy, fill = HDLevel), color = "black",
+                                                   bins = as.numeric(input$n_breaks)) + 
+      facet_wrap(~temp$Tuberculosis) + 
+    labs(title = "Life Expectancy over HDI by Deaths due to Tuberculosis per 10,000 people") 
+  
+  } else if (input$health_choice == "Tuberculosis" && input$Regions != "all"){
+    subtemp = world_hdi[which(world_hdi$HDLevel == input$Regions),]
+    subtemp = mutate(subtemp, Tuberculosis = cut(Deaths.due.to.Tuberculosis..per.100.000.people..,
+                                      c(-1, 10, 20, 40, 60, Inf),
+                                      labels = c("Extremely Low","Low",
+                                                  "Mid", "Slightly Large","Significantly Large")))
+    
+    p <- ggplot(data = subtemp) +
+          geom_histogram(aes(x = Life.expectancy, fill = HDLevel), color = "black",
+                            bins = as.numeric(input$n_breaks)) + 
+      facet_wrap(~subtemp$Tuberculosis) + 
+      labs(title = "Life Expectancy over HDI by Deaths due to Tuberculosis per 10,000 people")
+    
+    } else if (input$health_choice == "Physicians" && input$Regions != "all"){
+      subtemp = world_hdi[which(world_hdi$HDLevel == input$Regions),]
+      subtemp = mutate(subtemp, Physicians = cut(Physicians...per.10.000.people..2001.2014,
+                                                 c(-1, 5, 10, 20, Inf),
+                                                 labels = c("Extrmely Low (<5)","Low(<10)",
+                                                            "Moderate (<20)", "High(<infinity)")))
+      
+      p <- ggplot(data = subtemp) +
+        geom_histogram(aes(x = Life.expectancy, fill = HDLevel), color = "black",
+                       bins = as.numeric(input$n_breaks)) + 
+        facet_wrap(~subtemp$Physicians) + 
+        labs(title = "Life Expectancy over HDI by Deaths due to Tuberculosis per 10,000 people") 
+    } else if (input$health_choice == "General" && input$Regions != "all"){
+        p <- ggplot(data = world_hdi[which(world_hdi$HDLevel == input$Regions),]) + 
+          geom_histogram(aes(x = Life.expectancy, fill = HDLevel), color = "black",
+                                                       bins = as.numeric(input$n_breaks)) + 
+          labs(title = "Life Expectancy over HDI")
+    }
+  
   p_plotly <- ggplotly(p, height = 400)
   return(p_plotly)
-})
+  })
+
 #Education
 output$education_plotly_playable <- renderPlotly({
   if (input$education_choice == "General"){

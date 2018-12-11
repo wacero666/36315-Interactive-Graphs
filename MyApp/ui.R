@@ -38,21 +38,15 @@ tabPanel("HTML Widgets -- Dygraphs",
 ),
 
 
-tabPanel("Scatter Plot GNI",
+tabPanel("Income VS. HDI",
 
-         sliderInput(inputId = "pointSize1",
-                     label = "points' size adjustment:",
-                     min = 0.5, max = 3, value = 1, step = 0.3),
-         sliderInput(inputId = "pointSize2",
-                     label = "points' size adjustment:",
-                     min = 0.5, max = 3, value = 1, step = 0.3),
          selectizeInput(inputId = "Gender",
                         label = "Choose Your Content Ratings",
                         choices = c("Overall", "Female", "Male") ,
                         selected = c("Overall", "Female", "Male"),
                         multiple = TRUE,
                         options = NULL),
-         plotlyOutput(outputId = "plot1", height = 400, width = 900)
+         plotlyOutput(outputId = "income_plotly", height = 400, width = 900)
 
 
 ),
@@ -63,17 +57,28 @@ tabPanel("Education VS. HDI",
                      choices = c("General","Female","Male"),
                      selected = 5),
          
-         plotlyOutput(outputId = "education_plotly_playable", 
-                      height = 600,
-                      width = 900)
+         plotlyOutput(outputId = "education_plotly_playable")
 ),
 
-tabPanel("Histogram",
-         plotlyOutput("plot2", height = 250),
+tabPanel("Health vs. HDI",
+         plotlyOutput("health_histogram"),
+         
+         selectInput(inputId = "health_choice",
+                     label = "Show Relationship between Physicians/Tuberculosis",
+                     choices = c("General","Physicians","Tuberculosis"),
+                     selected = "General"),
+         
+         selectInput(inputId = "Regions",
+                     label = "Different Regions based on HDI Level",
+                     choices = c("Low Human Development","Medium Human Development",
+                                 "High Human Development","Very High Human Development", "all"),
+                     selected = "all"),
+
          selectInput(inputId = "n_breaks",
-                     label = "Number of bins in histogram (approximate):",
+                     label = "Number of bins in histogram",
                      choices = c(10, 20, 35, 50),
                      selected = 20)),
+
 tabPanel("Countour Line",
   checkboxInput(inputId = "contourline",
                 label = strong("Show ContourLine"),
