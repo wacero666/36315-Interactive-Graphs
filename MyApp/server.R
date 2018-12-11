@@ -90,19 +90,32 @@ output$income_plotly <- renderPlotly({
   
   p <- ggplot(data = world_hdi, aes(text = Country)) + my_theme +
     labs(title = "Countries's Estimated Gross National Income per Capita", 
-         y = "Human Development Index", x = "Gross National Income per Capita") + 
-    theme(legend.position = "bottom") 
+         y = "Human Development Index", x = "Gross National Income per Capita")
   
- if("Overall" %in% input$Gender){
+ if("Overall" %in% input$Gender && input$regression_line != TRUE){
    p <- p + geom_point(aes(x = Gross.national.income..GNI..per.capita, y = HDI), color = "brown") 
  }
-    
-  if("Male" %in% input$Gender){
-    p <- p + geom_point(aes(x = Estimated.gross.national.income.per.capita.Male, y = HDI), color = "pink") 
+  else if("Overall" %in% input$Gender && input$regression_line){
+    p <- p + geom_point(aes(x = Gross.national.income..GNI..per.capita, y = HDI), color = "brown") + 
+      geom_smooth(aes(x = Gross.national.income..GNI..per.capita, y = HDI))
   }
+  
+  if("Male" %in% input$Gender){
+    p <- p + geom_point(aes(x = Estimated.gross.national.income.per.capita.Male, y = HDI), color = "pink")
+    
+  } else if("Male" %in% input$Gender && input$regression_line){
+    p <- p + geom_point(aes(x = Estimated.gross.national.income.per.capita.Male, y = HDI), color = "pink") + 
+      geom_smooth(aes(x = Estimated.gross.national.income.per.capita.Male, y = HDI))
+  }
+  
   if("Female" %in% input$Gender){
     p <- p + geom_point(aes(x = Estimated.gross.national.income.per.capita.Female, y = HDI), color = "orange")
+    
+  } else if("Female" %in% input$Gender && input$regression_line){
+    p <- p + geom_point(aes(x = Estimated.gross.national.income.per.capita.Female, y = HDI), color = "orange") + 
+      geom_smooth(aes(x = Estimated.gross.national.income.per.capita.Female, y = HDI))
   }
+  
   p <- p 
   p_plotly <- ggplotly(p, height = 400)
   return(p_plotly)

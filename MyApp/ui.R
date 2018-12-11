@@ -46,7 +46,11 @@ tabPanel("Income VS. HDI",
                         selected = c("Overall", "Female", "Male"),
                         multiple = TRUE,
                         options = NULL),
-         plotlyOutput(outputId = "income_plotly", height = 400, width = 900)
+         plotlyOutput(outputId = "income_plotly", height = 400, width = 900), 
+         
+         checkboxInput(inputId = "regression_line",
+                       label = strong("Show Regression Line"),
+                        value = FALSE)
 
 
 ),
