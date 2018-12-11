@@ -243,72 +243,64 @@ output$education_plotly_playable <- renderPlotly({
 
 # Contour plot
 output$m_plot <- renderPlot({
-  continuous <- world_info %>% select("HDI","Life.expectancy",
-                                      "Mean.years.of.schooling",                                                                 "Gross.national.income..GNI..per.capita",                                                  "GNI.per.capita.rank.minus.HDI.rank",                                                      "Change.in.HDI.rank.2010.2015",                                                            "Average.annual.HDI.growth.1990.2000",                                                     "Average.annual.HDI.growth.2000.2010",
-                                      "Average.annual.HDI.growth.2010.2015",
-                                      "Average.annual.HDI.growth.1990.2015", 
-                                      "Gender.Development.Index.value",
-                                      "Gender.Development.Index.Group",
-                                      "Total.Population..millions..2015",                                                        "Total.Population..millions..2030",                                                        "Population.Average.annual.growth.2000.2005....",
-                                      "Population.Average.annual.growth.2010.2015....", 
-                                      "Population.Urban.2015..",  
-                                      "Population.Under.age.5..millions..2015",
-                                      "Population.Ages.15.64..millions..2015",
-                                      "Population.Ages.65.and.older..millions..2015", 
-                                      "Population.Median.age..years..2015",
-                                      "Dependency.Ration.Young.age..0.14....per.100.people.ages.15.64.",             
-                                      "Dependency.Ratio.Old.age..65.and.older....per.100.people.ages.15.64.",         
-                                      "Total.fertility.rate..birth.per.woman..2000.2005",                             
-                                      "Total.fertility.rate..birth.per.woman..2000.2007",                             
-                                      "Infants.exclusively.breastfed....ages.0.5.months..2010.2015",                  
-                                      "Infants.lacking.immunization.DTP....of.one.year.olds.",                        
-                                      "Infants.lacking.immunization.Measles....of.one.year.olds.",                    
-                                      "Child.malnutrition.Stunting..moderate.or.severe..2010.2015",                   
-                                      "Mortality.rates.Infant..per.1.000.live.births..2015",                          
-                                      "Mortality.rates.Under.five..per.1.000.live.births..2015" ,                     
-                                      "Deaths.due.to.Malria..per.100.000.people..",                                   
-                                      "Deaths.due.to.Tuberculosis..per.100.000.people..",                             
-                                      "HIV.prevalence..adult....ages.15.49.",                                         
-                                      "Life.expectancy.at.age.59..years..2010.2015",                                  
-                                      "Physicians...per.10.000.people..2001.2014",                                    
-                                      "Public.health.expenditure....of.GDP..2014",                                    
-                                      "Employment.to.population.ratio....ages.15.and.older." ,                        
-                                      "Labour.force.participation.rate....ages.15.and.older.",                        
-                                      "Employment.in.agriculture....of.total.employment..2010.2014",                  
-                                      "Employment.in.services....of.total.employment..2010..2014",                    
-                                      "Total.Unemployment....of.labour.force..2015" ,                                 
-                                      "Unemployment.Youth....ages.15.24..2010.2014" ,                                 
-                                      "Unemployment.Youth.not.in.school.or.employment....ages.15.24..2010.2014" ,     
-                                      "Vulnerable.employment....of.total.employment..2005.2014",                      
-                                      "Child.labour.....ages.5.14..2009.2015"   ,                                     
-                                      "Working.poor.at.PPP.3.10.a.day.....2004.2013",                                 
-                                      "Mandatory.paid.maternity.leave..days.",                                        
-                                      "Old.age.pension.recipients.....of.statutory.pension.age.population..2004.2013",
-                                      "Internet.users",                                                               
-                                      "Internet.users....2010..2015.",                                                
-                                      "Inequality.adjusted.HDI..IHDI.",                                               
-                                      "Inequality.adjusted.HDI..IHDI..Over.loss...",                                  
-                                      "Difference.from.HDI.rank",                                                     
-                                      "Coefficient.of.human.inequality",                                              
-                                      "Inequality.in.life.expectancy.....2010.2015" ,                                 
-                                      "Inequality.adjusted.life.expectancy.index",                                    
-                                      "Inequality.in.education..." ,                                                  
-                                      "Inequality.adjusted.education.index",                                          
-                                      "Inequality.in.income....",                                                     
-                                      "Inequality.adjusted.income.index",                                             
-                                      "Income.inequality..Quintile.ratio..2010.2015",                               
-                                      "Income.inequality..Palma.ratio..2010.2015",                                    
-                                      "Income.inequality..Gini.coefficient..2010.2015" )
-  continuous <- drop_na(continuous)
-  cont_scale <- scale(continuous)
+  all_cont_with_cc <- world_hdi %>% select("HDI",
+                                           "Life.expectancy",
+                                           "Mean.years.of.schooling", 
+                                           "Gross.national.income..GNI..per.capita",
+                                           "Total.Population..millions..2015","Total.Population..millions..2030",
+                                           "Population.Median.age..years..2015",
+                                           "Mortality.rates.Infant..per.1.000.live.births..2015",                          
+                                           "HIV.prevalence..adult....ages.15.49.",                                         
+                                           "Public.health.expenditure....of.GDP..2014",                                    
+                                           "Employment.to.population.ratio....ages.15.and.older." ,                        
+                                           "Labour.force.participation.rate....ages.15.and.older.",                        
+                                           "Total.Unemployment....of.labour.force..2015" ,                               
+                                           "Working.poor.at.PPP.3.10.a.day.....2004.2013",                                 
+                                           "Mandatory.paid.maternity.leave..days.",                                      
+                                           "Internet.users",                                                               
+                                           "Internet.users....2010..2015.",                                              
+                                           "Difference.from.HDI.rank",                                                     
+                                           "Coefficient.of.human.inequality",                          
+                                           "Inequality.adjusted.education.index",                    
+                                           "Inequality.adjusted.income.index",
+                                           "Country",
+                                           "continent"
+  )
+  
+  all_cont_with_cc[complete.cases(all_cont_with_cc), ]
+  
+  all_cont <-  all_cont_with_cc %>% select("HDI",
+                                           "Life.expectancy",
+                                           "Mean.years.of.schooling", 
+                                           "Gross.national.income..GNI..per.capita",
+                                           "Total.Population..millions..2015","Total.Population..millions..2030",
+                                           "Population.Median.age..years..2015",
+                                           "Mortality.rates.Infant..per.1.000.live.births..2015",                          
+                                           "HIV.prevalence..adult....ages.15.49.",                                         
+                                           "Public.health.expenditure....of.GDP..2014",                                    
+                                           "Employment.to.population.ratio....ages.15.and.older." ,                        
+                                           "Labour.force.participation.rate....ages.15.and.older.",                        
+                                           "Total.Unemployment....of.labour.force..2015" ,                               
+                                           "Working.poor.at.PPP.3.10.a.day.....2004.2013",                                 
+                                           "Mandatory.paid.maternity.leave..days.",                                      
+                                           "Internet.users",                                                               
+                                           "Internet.users....2010..2015.",                                              
+                                           "Difference.from.HDI.rank",                                                     
+                                           "Coefficient.of.human.inequality",                          
+                                           "Inequality.adjusted.education.index",                    
+                                           "Inequality.adjusted.income.index" )
+  cont_scale <- scale(all_cont)
   
   dist_cont <- dist(cont_scale)
   
   cont_mds <- cmdscale(dist_cont, k = 2)
   
   cont_mds <- data.frame(cont_mds)
+  cont_mds$Country <- all_cont_with_cc$Country
+  cont_mds$continent <- all_cont_with_cc$continent
   
-  colnames(cont_mds) <- c("mds_coordinate_1", "mds_coordinate_2")
+  colnames(cont_mds) <- c("mds_coordinate_1", "mds_coordinate_2","Country",
+                          "continent")
   
   
   base <- ggplot(cont_mds, 
