@@ -83,7 +83,10 @@ output$plotshiny <- renderPlotly({
 
 })
 
-#GNI
+############################################################################
+# income scatter plot 
+############################################################################
+
 
 output$income_plotly <- renderPlotly({
 # color = Income_Inequality
@@ -120,7 +123,9 @@ output$income_plotly <- renderPlotly({
   p_plotly <- ggplotly(p, height = 400)
   return(p_plotly)
 })
-
+############################################################################
+# health histogram 
+############################################################################
 output$health_histogram <- renderPlotly({
   
   temp <- world_hdi %>% select(Physicians...per.10.000.people..2001.2014,
@@ -187,35 +192,37 @@ output$health_histogram <- renderPlotly({
   return(p_plotly)
   })
 
-#Education
+############################################################################
+# education scatter plot (plotly playable)
+############################################################################
+
 output$education_plotly_playable <- renderPlotly({
   if (input$education_choice == "General"){
     p_gen <- ggplot(world_hdi, 
                     aes(x = `HDI`,
                         y = `Mean.years.of.schooling`,
-                        #color = continent,
+                        color = continent,
                         text = `Country`)) +
       geom_point(
         #frame = year
       )  + 
       labs(x = "HDI",
            y = "Mean Years of Schooling",
-           #color = "Continent",
+           color = "Continent",
            title = "HDI vs. Mean Years of Schooling") +
-      my_theme + scale_color_manual(values = cb_pal)
-    
+      my_theme + scale_color_manual(values = cb_pal) 
     
   } else if (input$education_choice == "Female"){
     p_gen <- ggplot(world_hdi, 
                     aes(x = `HDI`, 
-                        #color = continent,
+                        color = continent,
                         text = `Country`)) +
       geom_point(aes(y = `Mean.years.of.schooling.Female`
                      #frame = year
       )) + 
       labs(x = "HDI",
            y = "Mean Years of Schooling of Female",
-           #color = "Continent",
+           color = "Continent",
            title = "HDI vs. Mean Years of Schooling of Female") +
       my_theme + scale_color_manual(values = cb_pal)
     
@@ -223,25 +230,30 @@ output$education_plotly_playable <- renderPlotly({
   } else {
     p_gen <- ggplot(world_hdi, 
                     aes(x = `HDI`, 
-                        #color = continent,
+                        color = continent,
                         text = `Country`)) +
       geom_point(aes(y = `Mean.years.of.schooling.Male`
                      #frame = year
       )) + 
       labs(x = "HDI",
            y = "Mean Years of Schooling of Female",
-           #color = "Continent",
+           color = "Continent",
            title = "HDI vs. Mean Years of Schooling of Male") +
       my_theme + scale_color_manual(values = cb_pal)
     
   }
+
   
   p_gen_plotly <- ggplotly(p_gen,tooltip = "text")
   
   return(p_gen_plotly)
 })
 
-# Contour plot
+
+############################################################################
+# MDS contour plot
+############################################################################
+
 output$m_plot <- renderPlot({
   all_cont_with_cc <- world_hdi %>% select("HDI",
                                            "Life.expectancy",

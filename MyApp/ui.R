@@ -86,7 +86,7 @@ dashboardPage(
                           
                           tabPanel("Education VS. HDI",
                                    selectInput(inputId = "education_choice",
-                                               label = "Show general/female/male education ",
+                                               label = "Show general/female and male education",
                                                choices = c("General","Female","Male"),
                                                selected = 5),
                                    
