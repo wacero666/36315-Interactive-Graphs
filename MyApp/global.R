@@ -82,13 +82,9 @@ world_hdi$Country <- as.character(world_hdi$Country)
 world_hdi <- mutate(world_hdi, HDLevel = cut(HDI, c(0, 0.556, 0.7, 0.8, 1),
                                              labels = c("Low Human Development",  "Medium Human Development",
                                                         "High Human Development", "Very High Human Development")))
-if (!("data/world.Rdata" %in% list.files())){
-  library(geojsonio)
-  world = geojson_read("countries.geojson", method = "local", what = "sp")
-  save(world, file = "data/world.Rdata")
-} else{
-  load("data/world.Rdata")
-}
+library(geojsonio)
+world = geojson_read("countries.geojson", method = "local", what = "sp")
+
 
 #Add Continent column
 sub_world <- data.frame(name = world$name, continent = world$continent)
