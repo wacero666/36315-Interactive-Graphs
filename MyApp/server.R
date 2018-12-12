@@ -15,7 +15,7 @@ library(crosstalk)
 
 function(input, output) {
 
-
+## Histogram
 
 ############################################################################
 # Leaflet: HTML Widget (embedded in Shiny)
@@ -23,12 +23,22 @@ function(input, output) {
 
 output$leaflet <- renderLeaflet({
   
+  sub_world <- reactive({
+    all <- data.frame(Country = as.character(world$name))
+    sub <- world_info %>% subset(HDI.Rank <= as.numeric(input$TopNo.) & HDLevel %in% input$Level)
+    all <- all %>% left_join(sub, by = c("Country" = "name"))
+    
+    return (all)
+  })
+  
+  
+  sub_world_info <- sub_world()
   m_leaflet <- world %>% leaflet() %>% setView(0, 20, 2) %>%
     addProviderTiles("MapBox", 
                      options = providerTileOptions(
                        id = "mapbox.light",
                        accessToken = Sys.getenv('MAPBOX_ACCESS_TOKEN'))) %>%
-    addPolygons(fillColor = ~pal(world_info$HDI),
+    addPolygons(fillColor = ~pal(sub_world_info$HDI),
                 weight = 1,
                 opacity = 1,
                 color = "white",
@@ -74,7 +84,7 @@ output$plotshiny <- renderPlotly({
   })
   
   p <- ggplot(gdppc()) + my_theme +
-    labs (x = "Decades", y = "Average Annual HDI Growth(%)", title = "Average Annual HDI Growth 1990-2015(%)") + 
+    labs (x = "Decades", y = "Average Annual HDI Growth(%)", title = "Average Annual HDI Growth(%) 1990-2015") + 
     geom_line(mapping = aes(x = Decades, y = value, colour = variable, group = variable))
  
   p_plotly <- ggplotly(p,height = 400)

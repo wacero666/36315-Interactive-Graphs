@@ -92,6 +92,7 @@ if (!("data/world.Rdata" %in% list.files())){
 
 #Add Continent column
 sub_world <- data.frame(name = world$name, continent = world$continent)
+
 world_hdi <- world_hdi %>% left_join(sub_world, by = c("Country" = "name")) 
 
 
@@ -100,9 +101,8 @@ world_info$name <- as.character(world_info$name)
 
 world_info <- world_info %>% left_join(world_hdi,
                                        by = c("name" = "Country"))
-pal <- colorBin("YlOrRd", domain = world_info$HDI,
+pal <- colorBin("YlOrRd", domain = world_info$HDI, na.color = "grey",
                 bins = c(0,0.556, 0.7, 0.8, 1))
-
 
 labels_world <- paste0(
   "<strong>", world_info$name, 

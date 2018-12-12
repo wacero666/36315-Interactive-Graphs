@@ -21,7 +21,7 @@ library(shinydashboard)
 dashboardPage(
   skin = "red",
   
-  dashboardHeader(title = "World HDI Analysis"),
+  dashboardHeader(title = "World Human Development Index(HDI) Analysis"),
   dashboardSidebar(
     sidebarMenu(
       menuItem("Overview", tabName = "overview", icon = icon("globe")),
@@ -41,11 +41,32 @@ dashboardPage(
       # First tab content
       tabItem(tabName = "overview",
               tabsetPanel(type = "tabs",
-                          tabPanel("HTML Widgets -- leaflet", 
+                          
+                          tabPanel("World Map of HDI" , 
+                                   fluidRow(width=12,
+                                            column(width = 6,
+                                                  selectizeInput(inputId = "TopNo.", 
+                                                                 label = "Select Top n Countries", 
+                                                                 choices = world_hdi$HDI.Rank, 
+                                                                 selected = 188, 
+                                                                 multiple = FALSE,
+                                                                 options = NULL)),
+                                            column(width = 6,
+                                                  selectizeInput(inputId = "Level", 
+                                                                 label = "Select HDI Level", 
+                                                                 choices = unique(world_hdi$HDLevel), 
+                                                                 selected = c("Very High Human Development", "High Human Development",
+                                                                              "Medium Human Development", "Low Human Development"), 
+                                                                 multiple = TRUE,
+                                                                 options = NULL,
+                                                                 
+                                                  ))),
+                                                  
+                                     
                                    leafletOutput(outputId = "leaflet", height = "600px")
                           ),
                           
-                          tabPanel("HTML Widgets -- Dygraphs",
+                          tabPanel("Average Annual HDI Growth By Countries",
                                    selectizeInput(inputId = "country_subset", 
                                                   label = "Select Countries", 
                                                   choices = world_hdi$Country, 
